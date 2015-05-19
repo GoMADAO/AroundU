@@ -62,8 +62,11 @@ public class Writer extends HttpServlet {
 	     	possibleRequest.put("MSG",inner);
 	     	possibleRequest.put("OP","insert");
 	      	System.out.println(possibleRequest);
-	      	jsonObj = new JSONObject(request.getParameter("data").toString());//{...}
-	      	op = jsonObj.getString("OP");
+	      	if(request.getParameter("data")!=null){
+	      		jsonObj = new JSONObject(request.getParameter("data").toString());//{...}
+		      	op = jsonObj.getString("OP");
+	      	}
+	      		
      	} catch(Exception ex){
      		ex.printStackTrace();
      	}
@@ -93,7 +96,9 @@ public class Writer extends HttpServlet {
 	    	System.out.println("VendorError: " + ex.getErrorCode());
 	    }
 	
-	      	
+	    if(op==null){
+	    	return;
+	    }
 	    try {
 	    	Statement setupStatement = conn.createStatement();
 	    	
