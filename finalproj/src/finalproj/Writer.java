@@ -1,6 +1,7 @@
 package finalproj;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -62,8 +63,11 @@ public class Writer extends HttpServlet {
 	     	possibleRequest.put("MSG",inner);
 	     	possibleRequest.put("OP","insert");
 	      	System.out.println(possibleRequest);
-	      	jsonObj = new JSONObject(request.getParameter("data").toString());//{...}
-	      	op = jsonObj.getString("OP");
+	      	if(request.getParameter("data")!=null){
+	      		jsonObj = new JSONObject(request.getParameter("data").toString());//{...}
+		      	op = jsonObj.getString("OP");
+	      	}
+	      		
      	} catch(Exception ex){
      		ex.printStackTrace();
      	}
@@ -93,7 +97,13 @@ public class Writer extends HttpServlet {
 	    	System.out.println("VendorError: " + ex.getErrorCode());
 	    }
 	
-	      	
+	    if(op==null){
+	    	OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
+			  writer.write("");
+			  
+			  writer.flush();
+			  return;
+	    }
 	    try {
 	    	Statement setupStatement = conn.createStatement();
 	    	
@@ -165,7 +175,10 @@ public class Writer extends HttpServlet {
 	    	System.out.println("SQLState: " + ((SQLException) ex).getSQLState());
 	    	System.out.println("VendorError: " + ((SQLException) ex).getErrorCode());
 	    }
-
+	    OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
+		  writer.write("");
+		  
+		  writer.flush();
 	}
 
 	/**
