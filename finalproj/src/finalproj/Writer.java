@@ -1,6 +1,7 @@
 package finalproj;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -97,7 +98,11 @@ public class Writer extends HttpServlet {
 	    }
 	
 	    if(op==null){
-	    	return;
+	    	OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
+			  writer.write("");
+			  
+			  writer.flush();
+			  return;
 	    }
 	    try {
 	    	Statement setupStatement = conn.createStatement();
@@ -172,7 +177,10 @@ public class Writer extends HttpServlet {
 	    	System.out.println("SQLState: " + ((SQLException) ex).getSQLState());
 	    	System.out.println("VendorError: " + ((SQLException) ex).getErrorCode());
 	    }
-
+	    OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
+		  writer.write("");
+		  
+		  writer.flush();
 	}
 
 	/**
