@@ -70,7 +70,7 @@ public class Writer extends HttpServlet {
       	//----end----
       	
     
-    	
+    	System.out.println(jsonObj);
     	// Load the JDBC Driver
 	    try {
 	    	System.out.println("Loading driver...");
@@ -104,19 +104,17 @@ public class Writer extends HttpServlet {
 		    	if(type.equals("normal")){//////if it is normal
 		    		
 		    		//double a=0;
-		    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"');";
+		    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid,abstract) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"');";
 		    		setupStatement.execute(add);
 		    	}
 		    		
 		    	else if(type.equals("emergency")){///if it is emergency 
-		    		String add = "INSERT INTO Emergency (text,longtitude,latitude,userid) VALUES('"+msg.getString("text")+"', '"+msg.getDouble("lng")+"' ,'"+msg.getDouble("lat")+"','"+msg.getString("userid")+"');";
-		    		setupStatement.execute(add);
+		    		String add = "INSERT INTO Emergency (text,longtitude,latitude,userid,abstract) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"');";		    		setupStatement.execute(add);
 		    			
 		    	}
 		    		
 		    	else if(type.equals("importance")) {///////if is and importance
-		    		String add = "INSERT INTO Importance (text,longtitude,latitude,userid) VALUES('"+msg.getString("text")+"', '"+msg.getDouble("lng")+"' ,'"+msg.getDouble("lat")+"','"+msg.getString("userid")+"');";
-		    		setupStatement.execute(add);
+		    		String add = "INSERT INTO Importance (text,longtitude,latitude,userid,abstract) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"');";		    		setupStatement.execute(add);
 		    	}
 		    	
 		    }

@@ -42,6 +42,7 @@ public class read extends HttpServlet {
 		JSONArray emergencyText = new JSONArray();
 		JSONArray importanceText = new JSONArray();
 		JSONObject sendingText = new JSONObject();
+		JSONArray topiclist = new JSONArray();
 
 		 // System.out.println(request.getParameter("range"));
 		  try {
@@ -54,6 +55,7 @@ public class read extends HttpServlet {
 		  ResultSet resultSet1 = null;
 		  ResultSet resultSet2 = null;
 		  ResultSet resultSet3 = null;
+		  ResultSet resultSet4 = null;
 		  
 		  
 		  try {
@@ -86,7 +88,8 @@ public class read extends HttpServlet {
 			    resultSet2 = readStatement.executeQuery("SELECT * FROM Emergency;");		
 			    while (resultSet2.next()) {
 			    	JSONObject text = new JSONObject();			
-			        text.put("text",resultSet2.getString("text"));			    					    		
+			        text.put("text",resultSet2.getString("text"));
+			        text.put("abstract",resultSet2.getString("abstract"));
 			        text.put("userid",resultSet2.getString("userid"));
 			        text.put("report",resultSet2.getString("reporttimes"));
 			        text.put("map",resultSet2.getString("mapOn"));
@@ -100,6 +103,7 @@ public class read extends HttpServlet {
 			    while (resultSet3.next()) {
 			    	JSONObject text = new JSONObject();				    
 			    	text.put("text",resultSet3.getString("text"));
+			    	 text.put("abstract",resultSet3.getString("abstract"));
 			    	text.put("topic",resultSet3.getString("topic"));			    		
 			    	text.put("sentiment",resultSet3.getString("sentiment"));			    		
 			    	text.put("userid",resultSet3.getString("userid"));
@@ -107,7 +111,13 @@ public class read extends HttpServlet {
 			    	text.put("time",resultSet3.getString("time"));
 			    	text.put("id",resultSet3.getString("id"));
 			    	importanceText.add(text);
-			    }			  			    
+			    }
+			    
+			    resultSet4 = readStatement.executeQuery("select distinct topic from Normal where topic != 'No Topic found'");
+			    while(resultSet4.next()){
+			    	topiclist.add(resultSet4.getString("topic"));
+			    }
+			    
 			    
 			  } catch (SQLException ex) {
 			    // handle any errors
@@ -123,6 +133,7 @@ public class read extends HttpServlet {
 		  sendingText.put("normal", normalText);
 		  sendingText.put("emergency", emergencyText);
 		  sendingText.put("importance",importanceText);
+		  sendingText.put("topiclist",topiclist);
 		  
 		  System.out.println(sendingText);
 //		  PrintWriter out = response.getWriter();		  
