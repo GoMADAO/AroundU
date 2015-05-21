@@ -66,7 +66,7 @@ public class read extends HttpServlet {
 			    
 			   
 			    resultSet1 = readStatement.executeQuery("SELECT * FROM Normal WHERE (longtitude between -73.96651 AND -73.90651) AND "
-			    		+ "(latitude between 40.7038597 AND 40.8038597);");		
+			    		+ "(latitude between 40.7038597 AND 40.8038597) order by time desc;");		
 			    while (resultSet1.next()) {
 			    	JSONObject text = new JSONObject();	
 				    text.put("text",resultSet1.getString("text"));
@@ -85,7 +85,7 @@ public class read extends HttpServlet {
 			   
 			    
 			
-			    resultSet2 = readStatement.executeQuery("SELECT * FROM Emergency;");		
+			    resultSet2 = readStatement.executeQuery("SELECT * FROM Emergency  order by time desc;");		
 			    while (resultSet2.next()) {
 			    	JSONObject text = new JSONObject();			
 			        text.put("text",resultSet2.getString("text"));
@@ -101,7 +101,7 @@ public class read extends HttpServlet {
 			    }
 			    
 		
-			    resultSet3 = readStatement.executeQuery("SELECT * FROM Importance;");		
+			    resultSet3 = readStatement.executeQuery("SELECT * FROM Importance  order by time desc;");		
 			    while (resultSet3.next()) {
 			    	JSONObject text = new JSONObject();				    
 			    	text.put("text",resultSet3.getString("text"));
@@ -117,7 +117,8 @@ public class read extends HttpServlet {
 			    	importanceText.add(text);
 			    }
 			    
-			    resultSet4 = readStatement.executeQuery("select distinct topic from Normal where topic != 'No Topic found'");
+			    resultSet4 = readStatement.executeQuery("select distinct topic from Normal where topic != 'No Topic found'"
+			    		+ "  order by topic asc");
 			    while(resultSet4.next()){
 			    	topiclist.add(resultSet4.getString("topic"));
 			    }
