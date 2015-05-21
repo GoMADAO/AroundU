@@ -95,6 +95,8 @@ public class read extends HttpServlet {
 			        text.put("map",resultSet2.getString("mapOn"));
 			        text.put("time",resultSet2.getString("time"));
 			        text.put("id",resultSet2.getString("id"));
+			        text.put("lon",resultSet2.getString("longtitude"));
+				    text.put("lat",resultSet2.getString("latitude"));
 			        emergencyText.add(text);
 			    }
 			    
@@ -110,6 +112,8 @@ public class read extends HttpServlet {
 			    	text.put("report",resultSet3.getString("reporttimes"));
 			    	text.put("time",resultSet3.getString("time"));
 			    	text.put("id",resultSet3.getString("id"));
+			    	text.put("lon",resultSet3.getString("longtitude"));
+				    text.put("lat",resultSet3.getString("latitude"));
 			    	importanceText.add(text);
 			    }
 			    
