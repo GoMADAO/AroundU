@@ -39,4 +39,14 @@
     <servlet-name>User</servlet-name>
     <url-pattern>/User</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>write</display-name>
+    <servlet-name>write</servlet-name>
+    <servlet-class>finalproj.write</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>write</servlet-name>
+    <url-pattern>/write</url-pattern>
+  </servlet-mapping>
 </web-app>
