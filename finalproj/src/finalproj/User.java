@@ -65,7 +65,7 @@ public class User extends HttpServlet {
 	           
 	        try {
 	            writeStatement = conn.createStatement();
-	            writeStatement.execute("INSERT INTO User (userid,isblock,isactive) VALUES('"+uid+"','0','1')");
+	            writeStatement.execute("INSERT INTO User (userid,isblock,isactive) VALUES('"+uid+"','0','1');");
 	            writeStatement.close();
 	            
 	        } catch (SQLException e) {
