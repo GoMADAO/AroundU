@@ -131,6 +131,7 @@ public class read extends HttpServlet {
 			    }
 			    
 			    resultSet4 = readStatement.executeQuery("select distinct topic from Normal where topic != 'No Topic found'"
+			    		+ " AND (longtitude between " + lon + " - " + range + " AND " + lon + " + " + range + ") "
 			    		 +"AND (latitude between " + lat + " - " + range + " AND " + lat + " + " + range + " )  order by topic asc");
 			    while(resultSet4.next()){
 			    	topiclist.add(resultSet4.getString("topic"));
