@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 public class read extends HttpServlet {
@@ -35,7 +37,6 @@ public class read extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
-		System.out.println(request.getParameter("data"));
 		
 		Connection conn = null;
 		JSONArray normalText = new JSONArray();
@@ -43,6 +44,18 @@ public class read extends HttpServlet {
 		JSONArray importanceText = new JSONArray();
 		JSONObject sendingText = new JSONObject();
 		JSONArray topiclist = new JSONArray();
+		JSONParser jsonParser = new JSONParser();
+		JSONObject radius = null;
+		try {
+			radius = (JSONObject) jsonParser.parse(request.getParameter("data").toString());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		int lon1 = Integer.parseInt(radius.get("lon").toString()) - Integer.parseInt(radius.get("range").toString());
+		int lon2 = Integer.parseInt(radius.get("lon").toString()) + Integer.parseInt(radius.get("range").toString());
+		int lat1 = Integer.parseInt(radius.get("lat").toString()) - Integer.parseInt(radius.get("range").toString());
+		int lat2 = Integer.parseInt(radius.get("lat").toString()) + Integer.parseInt(radius.get("range").toString());
 
 		 // System.out.println(request.getParameter("range"));
 		  try {
@@ -65,8 +78,8 @@ public class read extends HttpServlet {
 			    readStatement = conn.createStatement();
 			    
 			   
-			    resultSet1 = readStatement.executeQuery("SELECT * FROM Normal WHERE (longtitude between -73.96651 AND -73.90651) AND "
-			    		+ "(latitude between 40.7038597 AND 40.8038597) order by time desc;");		
+			    resultSet1 = readStatement.executeQuery("SELECT * FROM Normal WHERE (longtitude between " + lon1 + " AND " + lon2 + ") AND "
+			    		+ "(latitude between " + lat1 + " AND " + lat2 + ") order by time desc;");		
 			    while (resultSet1.next()) {
 			    	JSONObject text = new JSONObject();	
 				    text.put("text",resultSet1.getString("text"));
@@ -85,7 +98,8 @@ public class read extends HttpServlet {
 			   
 			    
 			
-			    resultSet2 = readStatement.executeQuery("SELECT * FROM Emergency  order by time desc;");		
+			    resultSet2 = readStatement.executeQuery("SELECT * FROM Emergency WHERE (longtitude between " + lon1 + " AND " + lon2 + ") AND "
+			    		+ "(latitude between " + lat1 + " AND " + lat2 + ") order by time desc;");		
 			    while (resultSet2.next()) {
 			    	JSONObject text = new JSONObject();			
 			        text.put("text",resultSet2.getString("text"));
@@ -101,7 +115,8 @@ public class read extends HttpServlet {
 			    }
 			    
 		
-			    resultSet3 = readStatement.executeQuery("SELECT * FROM Importance  order by time desc;");		
+			    resultSet3 = readStatement.executeQuery("SELECT * FROM Importance WHERE (longtitude between " + lon1 + " AND " + lon2 + ") AND "
+			    		+ "(latitude between " + lat1 + " AND " + lat2 + ") order by time desc;");		
 			    while (resultSet3.next()) {
 			    	JSONObject text = new JSONObject();				    
 			    	text.put("text",resultSet3.getString("text"));
