@@ -78,7 +78,7 @@ public class User extends HttpServlet {
 			JSONObject rt = new JSONObject();
 			try {
 				stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT * FROM USER WHERE userid = '"+uid+"';");
+				ResultSet rs = stmt.executeQuery("SELECT * FROM User WHERE userid = '"+uid+"';");
 				while(rs.next()){
 					rt.put("isactive", (Integer.parseInt(rs.getString("isactive"))==1)?true:false );
 					rt.put("isblock", (Integer.parseInt(rs.getString("isblock"))==1)?true:false);					
@@ -102,7 +102,7 @@ public class User extends HttpServlet {
 	           
 	        try {
 	            writeStatement = conn.createStatement();
-	            writeStatement.execute("UPDATE USER SET isblock = 1 WHERE userid='"+uid+"';");
+	            writeStatement.execute("UPDATE User SET isblock = 1 WHERE userid='"+uid+"';");
 	            writeStatement.close();
 	            
 	        } catch (SQLException e) {
@@ -115,7 +115,7 @@ public class User extends HttpServlet {
 	           
 	        try {
 	            writeStatement = conn.createStatement();
-	            writeStatement.execute("UPDATE USER SET isblock = 0 WHERE userid='"+uid+"';");
+	            writeStatement.execute("UPDATE User SET isblock = 0 WHERE userid='"+uid+"';");
 	            writeStatement.close();
 	            
 	        } catch (SQLException e) {
