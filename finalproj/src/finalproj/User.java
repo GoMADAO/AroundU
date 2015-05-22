@@ -102,7 +102,7 @@ public class User extends HttpServlet {
 	           
 	        try {
 	            writeStatement = conn.createStatement();
-	            writeStatement.execute("UPDATE USER SET isblock = 1 WHERE userid'"+uid+"';");
+	            writeStatement.execute("UPDATE USER SET isblock = 1 WHERE userid='"+uid+"';");
 	            writeStatement.close();
 	            
 	        } catch (SQLException e) {
@@ -115,7 +115,7 @@ public class User extends HttpServlet {
 	           
 	        try {
 	            writeStatement = conn.createStatement();
-	            writeStatement.execute("UPDATE USER SET isblock = 0 WHERE userid'"+uid+"';");
+	            writeStatement.execute("UPDATE USER SET isblock = 0 WHERE userid='"+uid+"';");
 	            writeStatement.close();
 	            
 	        } catch (SQLException e) {
