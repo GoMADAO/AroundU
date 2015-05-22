@@ -114,7 +114,7 @@ public class Writer extends HttpServlet {
 		    	if(type.equals("normal")){//////if it is normal
 		    		
 		    		//double a=0;
-		    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid,abstract) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"');";
+		    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"');";
 		    		setupStatement.execute(add);
 		    	}
 		    		
