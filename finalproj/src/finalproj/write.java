@@ -61,7 +61,7 @@ public class write extends HttpServlet {
 		
 		
 		if(request.getParameter("data")==null){
-      		System.out.println("Server-Write Initializaion");
+      		System.out.println("No data");
 	      	return;
       	}
 		JSONObject jsonObj=null;
