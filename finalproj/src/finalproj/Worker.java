@@ -186,10 +186,10 @@ public class Worker implements Runnable{
 			    		}
 			    		
 			    		//double a=0;
-			    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid,sentiment)"
+			    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid,sentiment,time)"
 			    				+ " VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"
 			    				+ msg.getString("lat")+"','"+msg.getString("userid")+"','"
-			    						+ senti+"');";
+			    						+ senti+"', Now()-Interval 4 HOUR);";
 			    		stmt.execute(add);
 			    	}
 			    		
