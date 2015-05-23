@@ -1,18 +1,32 @@
 package finalproj;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
+
 
 
 
@@ -32,6 +46,87 @@ public class Worker implements Runnable{
 		this.conn = conn;
 		
 	}
+	
+	private String parse(String content){
+		String sent = null;
+		try {
+			JSONObject pkg = new JSONObject(content);
+			String status = pkg.getString("status");
+			
+			System.out.println("this is the status"+status);
+			if(!status.equals("OK"))
+				return null;
+						
+			JSONObject docSen =pkg.getJSONObject("docSentiment"); 
+			
+			System.out.println();
+			if (docSen.has("score"))
+				sent = docSen.getString("score");
+			else
+				sent = "0";
+		} catch (JSONException e) {
+
+			e.printStackTrace();
+		}
+		return sent;
+		
+	}
+	
+	
+	private String callAlchemy(String data){
+		
+		HttpClient client = HttpClients.createDefault();
+		HttpPost post = new HttpPost("http://access.alchemyapi.com/calls/text/TextGetTextSentiment");
+		HttpResponse response = null;
+		HttpEntity entity = null;
+		
+		List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+		params.add(new BasicNameValuePair("apikey", Global.Alchemykey));
+		params.add(new BasicNameValuePair("text", data));
+		params.add(new BasicNameValuePair("outputMode","json"));
+		
+		try {
+			post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			
+			e.printStackTrace();
+		}
+		
+		// Execute and get the response.
+		try {
+			response = client.execute(post);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		entity = response.getEntity();
+		
+		String rt = null;
+		
+		if (entity != null) {
+		    BufferedReader br=null;
+		    String line;
+			try {
+				br = new BufferedReader(new InputStreamReader(entity.getContent()));
+				StringBuffer sb = new StringBuffer();
+				while((line=br.readLine())!=null){
+					sb.append(line);
+				}
+				br.close();
+				
+				rt = parse(sb.toString());
+				
+				
+			}catch (IllegalStateException | IOException e1) {
+				
+				e1.printStackTrace();
+			}
+		}
+		return rt;
+		
+	}
+	
+	
 	@Override
 	public void run(){
 		System.out.println(Thread.currentThread().toString());
@@ -57,6 +152,7 @@ public class Worker implements Runnable{
             if(times>1)
             	continue;
             
+            System.out.println("Processing message:"+message.getMessageId());
             
             String op=null;
             JSONObject jsonObj = null;
@@ -64,7 +160,7 @@ public class Worker implements Runnable{
             	jsonObj= new JSONObject(message.getBody());
             	op = jsonObj.getString("OP");
 			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
+				
 				e1.printStackTrace();
 			}
 
@@ -75,18 +171,25 @@ public class Worker implements Runnable{
 				stmt = conn.createStatement();
 				//stmt.execute("");
 				
-				
-				
 				if(op.equals("insert")){
+					
 			    	
 			    	JSONObject msg = jsonObj.getJSONObject("MSG");
 			    	String type = msg.getString("type");
 			    	if(type.equals("normal")){//////if it is normal
 			    		
+			    		
+			    		String senti = callAlchemy(msg.getString("text"));
+			    		if(senti==null){
+			    			
+			    			senti = "neutral";
+			    		}
+			    		
 			    		//double a=0;
-			    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid)"
+			    		String add = "INSERT INTO Normal (text,longtitude,latitude,userid,sentiment)"
 			    				+ " VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"
-			    				+ msg.getString("lat")+"','"+msg.getString("userid")+"');";
+			    				+ msg.getString("lat")+"','"+msg.getString("userid")+"','"
+			    						+ senti+"');";
 			    		stmt.execute(add);
 			    	}
 			    		
@@ -106,51 +209,18 @@ public class Worker implements Runnable{
 			    	
 			    }
 			    
-			    if(op.equals("like")){
-			    	JSONObject msg = jsonObj.getJSONObject("MSG");
-			    	String type = msg.getString("type");
-			    	if(type.equals("normal")){//////if it is normal
-			    					    
-			    		//System.out.println(msg.getDouble("id"));
-			    		//System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
-			    		stmt.execute("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
-			    	
-			    	}
-			    }
-			
-			    if(op.equals("dislike")){
-			    	JSONObject msg = jsonObj.getJSONObject("MSG");
-			    	String type = msg.getString("type");
-			    	if(type.equals("normal")) {//////if it is normal
-					    //System.out.println(msg.getDouble("id"));
-					    //System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
-					    stmt.execute("UPDATE Normal SET dislikes = dislikes+1 where id = "+ msg.getInt("id")+";");
-			    	
-			    	}
-			    }
-			
-			    if(op.equals("report")){
-			    	JSONObject msg = jsonObj.getJSONObject("MSG");
-			    	String type = msg.getString("type");
-			    	if(type.equals("emergency")) {//////if it is normal
-			    		
-			    		//System.out.println(msg.getDouble("id"));
-			    		//System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
-			    		stmt.execute("UPDATE Emergency SET reporttimes = reporttimes+1 where id = "+ msg.getInt("id")+";");
-			    	
-			    	}
-			    }
+			    
 				
 				
 				
 			} catch (SQLException | JSONException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}finally{
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}

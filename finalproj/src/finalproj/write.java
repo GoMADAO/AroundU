@@ -1,6 +1,10 @@
 package finalproj;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,24 +65,78 @@ public class write extends HttpServlet {
 	      	return;
       	}
 		JSONObject jsonObj=null;
+		String op=null;
 		try {
 			jsonObj = new JSONObject(request.getParameter("data").toString());
-		} catch (JSONException e) {
+			op = jsonObj.getString("OP");
+			
+			Statement stmt = null;
+			if(op.equals("insert")){
+				SendMessageRequest smr = new SendMessageRequest();
+				smr.setQueueUrl(Global.queueURL);
+				//TODO body is the json
+				smr.setMessageBody(jsonObj.toString());
+				Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
+				messageAttributes.put("number", 
+						new MessageAttributeValue()
+							.withDataType("String")
+							.withStringValue("0"));
+				smr.withMessageAttributes(messageAttributes);
+				sqs.sendMessage(smr);
+				
+			}else{
+				Connection conn ;
+				conn = DriverManager.getConnection(Global.jdbcUrl);
+				stmt = conn.createStatement();
+				
+				if(op.equals("like")){
+			    	JSONObject msg = jsonObj.getJSONObject("MSG");
+			    	String type = msg.getString("type");
+			    	if(type.equals("normal")){//////if it is normal
+			    					    
+			    		//System.out.println(msg.getDouble("id"));
+			    		//System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
+			    		stmt.execute("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
+			    	
+			    	}
+			    }
+			
+			    if(op.equals("dislike")){
+			    	JSONObject msg = jsonObj.getJSONObject("MSG");
+			    	String type = msg.getString("type");
+			    	if(type.equals("normal")) {//////if it is normal
+					    //System.out.println(msg.getDouble("id"));
+					    //System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
+					    stmt.execute("UPDATE Normal SET dislikes = dislikes+1 where id = "+ msg.getInt("id")+";");
+			    	
+			    	}
+			    }
+			
+			    if(op.equals("report")){
+			    	JSONObject msg = jsonObj.getJSONObject("MSG");
+			    	String type = msg.getString("type");
+			    	if(type.equals("emergency")) {//////if it is normal
+			    		
+			    		//System.out.println(msg.getDouble("id"));
+			    		//System.out.println("UPDATE Normal SET likes = likes+1 where id = "+ msg.getInt("id")+";");
+			    		stmt.execute("UPDATE Emergency SET reporttimes = reporttimes+1 where id = "+ msg.getInt("id")+";");
+			    	
+			    	}else if(type.equals("importance")){
+			    		stmt.execute("UPDATE Importance SET reporttimes = reporttimes+1 where id = "+ msg.getInt("id")+";");
+			    	}
+			    	
+			    }
+			    
+			    stmt.close();
+			    conn.close();
+			}
+			
+		} catch (JSONException | SQLException e) {
 			e.printStackTrace();
 		}
 		
-		SendMessageRequest smr = new SendMessageRequest();
-			smr.setQueueUrl(Global.queueURL);
-			//TODO body is the json
-			smr.setMessageBody(jsonObj.toString());
-			Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
-			messageAttributes.put("number", 
-					new MessageAttributeValue()
-						.withDataType("String")
-						.withStringValue("0"));
-			smr.withMessageAttributes(messageAttributes);
-			sqs.sendMessage(smr);
-			
+		
+		
 		
 	}
 
