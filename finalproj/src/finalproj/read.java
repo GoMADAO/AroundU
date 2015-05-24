@@ -163,8 +163,7 @@ public class read extends HttpServlet {
 //		  out.flush();
 		  
 		  OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
-		  writer.write(sendingText.toString());
-		  
+		  writer.write(sendingText.toString());		  
 		  writer.flush();
 		
 	}

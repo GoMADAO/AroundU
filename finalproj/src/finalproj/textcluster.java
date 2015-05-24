@@ -1,28 +1,15 @@
 package finalproj;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -32,22 +19,14 @@ public class textcluster {
 	
 	
 	 @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
-	public static void main(String[] argc){
+	public static void go(){
 		 
 		 	//clustering analysis setup
 			JSONObject checkingText = new JSONObject();		
 			checkingText.put("type", "pre-sentenced");				
 			JSONArray jarray = new JSONArray();
 			
-			//sentiment analysis setup
-			HttpClient senticlient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("http://access.alchemyapi.com/calls/text/TextGetTextSentiment");
-			org.apache.http.HttpResponse sentiresponse;
-			HttpEntity entity;
-			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-			params.add(new BasicNameValuePair("apikey", Global.Alchemykey));
-			params.add(new BasicNameValuePair("outputMode","json"));
-			String scoretype = null;
+			
 			int i=0;
 			
 			try {	
@@ -79,30 +58,6 @@ public class textcluster {
 					    		String dbtext = resultSet.getString("text");
 					    		int id = resultSet.getShort("id");
 					    		if(count == 0) i = id;
-					    		params.add(new BasicNameValuePair("text", dbtext));
-					    		
-					    		try {
-			                		post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-			                		sentiresponse = senticlient.execute(post);
-			                		entity = sentiresponse.getEntity();
-			                		BufferedReader rd = new BufferedReader(new InputStreamReader(sentiresponse.getEntity().getContent()));
-			                		JSONParser jsonParser = new JSONParser();
-			                		JSONObject jsonObject = (JSONObject) jsonParser.parse(rd);
-
-			                		if(jsonObject.get("status").toString().equals("OK")){
-			             
-				                		JSONObject temp = (JSONObject) jsonObject.get("docSentiment");
-				                		scoretype= temp.get("type").toString();
-				                				                				               		
-			                		//insert back to the database
-			                	     writeStatement.execute("UPDATE Normal SET sentiment = '" + scoretype + "' where id = "+id);
-			                		} 
-			                		
-			                	} catch (UnsupportedEncodingException e) {
-			                		// TODO Auto-generated catch block
-			                		e.printStackTrace();
-			                	}
-				    		
 					    		count++;
 					    		//adding to clustering Json
 					    		JSONObject text = new JSONObject();	
@@ -122,7 +77,7 @@ public class textcluster {
 		
 
 					
-					System.out.println(checkingText.toString());
+					System.out.println("Initializing clustering");
 					
 					//sending clustering evaluation request to the cluster API
 					HttpResponse<JsonNode> response = Unirest.post("https://rxnlp-core.p.mashape.com/generateClusters")
@@ -132,7 +87,7 @@ public class textcluster {
 					.body(checkingText.toString())
 					.asJson();
 
-					System.out.println(response.getBody());
+					System.out.println("Clustering Done");
 					JSONParser jsonParser = new JSONParser();
 					JSONObject clusterResult = (JSONObject) jsonParser.parse(response.getBody().toString());
 					JSONObject temp1 = (JSONObject) clusterResult.get("results");

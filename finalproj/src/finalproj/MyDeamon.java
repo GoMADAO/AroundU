@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,8 +24,6 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 
-import finalproj.appThread.Workerpool;
-import finalproj.appThread.reader;
 
 public class MyDeamon extends Thread{
 	
@@ -36,11 +33,11 @@ public class MyDeamon extends Thread{
 	
 	
 	
-	public static class reader implements Runnable{
+	public static class cleanup implements Runnable{
 
 		public synchronized void run(){
 			
-			int Interval = 1000;
+			int Interval = 3600000*24;
 			try{	
 				while(true){
 					finalproj.Scavenger.go();
@@ -55,14 +52,14 @@ public class MyDeamon extends Thread{
 	
 	
 	
-	public static class Workerpool implements Runnable{
+	public static class clusterTopic implements Runnable{
 		public synchronized void run(){
 			
 			//reader push message every Interval ms
-			int Interval = 1000;
+			int Interval = 3600000;
 			try {
 				while(true){
-				//	finalproj.textcluster.go();
+					finalproj.textcluster.go();
 					Thread.sleep(Interval);
 				}
 			} catch (Exception e) {
@@ -123,11 +120,11 @@ public class MyDeamon extends Thread{
 		//Run cluster and scavenger
 		try{
 			
-			Thread t1 = new Thread(new reader());
-            t1.start();
+			Thread cleaningThread = new Thread(new cleanup());
+			cleaningThread.start();
 		
-            Thread t3 = new Thread(new Workerpool());
-            t3.start();
+            Thread clusteringThread = new Thread(new clusterTopic());
+            clusteringThread.start();
           
             
 		}catch(Exception ex){

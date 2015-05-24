@@ -60,10 +60,10 @@ public class Worker implements Runnable{
 			JSONObject docSen =pkg.getJSONObject("docSentiment"); 
 			
 			System.out.println();
-			if (docSen.has("score"))
-				sent = docSen.getString("score");
+			if (docSen.has("type"))
+				sent = docSen.getString("type");
 			else
-				sent = "0";
+				sent = "neutral";
 		} catch (JSONException e) {
 
 			e.printStackTrace();
@@ -194,16 +194,17 @@ public class Worker implements Runnable{
 			    	}
 			    		
 			    	else if(type.equals("emergency")){///if it is emergency 
-			    		String add = "INSERT INTO Emergency (text,longtitude,latitude,userid,abstract)"
+			    		String add = "INSERT INTO Emergency (text,longtitude,latitude,userid,abstract,time,mapOn)"
 			    				+ " VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")
 			    				+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")
-			    				+"','"+msg.getString("abstract")+"');";		    		
+			    				+"','"+msg.getString("abstract")+"', Now()-Interval 4 HOUR," + msg.getString("map") + ");";		    		
 			    		stmt.execute(add);
 			    			
 			    	}
 			    		
 			    	else if(type.equals("importance")) {///////if is and importance
-			    		String add = "INSERT INTO Importance (text,longtitude,latitude,userid,abstract) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"');";		    		
+			    		String add = "INSERT INTO Importance (text,longtitude,latitude,userid,abstract,time) VALUES('"+msg.getString("text")+"', '"+msg.getString("lng")+"' ,'"
+			    						+msg.getString("lat")+"','"+msg.getString("userid")+"','"+msg.getString("abstract")+"', Now()-Interval 4 HOUR);";		    		
 			    		stmt.execute(add);
 			    	}
 			    	
