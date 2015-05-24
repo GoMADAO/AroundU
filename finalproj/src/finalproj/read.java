@@ -47,7 +47,10 @@ public class read extends HttpServlet {
 		JSONParser jsonParser = new JSONParser();
 		JSONObject radius = null;
 		try {
-			radius = (JSONObject) jsonParser.parse(request.getParameter("data").toString());
+			String rt = request.getParameter("data");
+			if(rt ==null)
+				return;
+			radius = (JSONObject) jsonParser.parse(rt);
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
