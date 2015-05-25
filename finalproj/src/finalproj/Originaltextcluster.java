@@ -67,7 +67,7 @@ public class Originaltextcluster {
 		  
 				   try {
 					   if(conn==null)
-						   conn = DriverManager.getConnection(Global.jdbcUrl1);
+						   conn = DriverManager.getConnection(Global.jdbcUrl);
 				    
 					    readStatement = conn.createStatement();
 					    writeStatement = conn.createStatement();

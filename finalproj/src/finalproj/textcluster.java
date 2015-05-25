@@ -61,10 +61,10 @@ public class textcluster {
 					    		count++;
 					    		//adding to clustering Json
 					    		JSONObject text = new JSONObject();	
-					    		text.put("sentence",dbtext);
+					    		text.put("sentence",id+":" +dbtext);
 					    		jarray.add(text);
 				    }
-					
+					System.out.println(jarray.size());
 					checkingText.put("text",jarray); 
 					
 				    
@@ -78,7 +78,7 @@ public class textcluster {
 
 					
 					System.out.println("Initializing clustering");
-					
+					System.out.println(checkingText.toString());
 					//sending clustering evaluation request to the cluster API
 					HttpResponse<JsonNode> response = Unirest.post("https://rxnlp-core.p.mashape.com/generateClusters")
 					.header("X-Mashape-Key", Global.Mashapekey)
@@ -86,7 +86,8 @@ public class textcluster {
 					.header("Accept", "application/json")					 
 					.body(checkingText.toString())
 					.asJson();
-
+					
+					System.out.println(response.getBody().toString());
 					System.out.println("Clustering Done");
 					JSONParser jsonParser = new JSONParser();
 					JSONObject clusterResult = (JSONObject) jsonParser.parse(response.getBody().toString());
@@ -97,22 +98,23 @@ public class textcluster {
 					
 					//receiving results and store back to database;
 					Iterator i1 = temp2.iterator();
+
 					while(i1.hasNext()){
 						JSONObject temp3 = (JSONObject) i1.next();
 						JSONArray temp4 = (JSONArray) temp3.get("clusteredSentences");
 						Iterator i2 = temp4.iterator();
 						while(i2.hasNext()){
 							String sentenceidTemp = i2.next().toString();
-							int id = Integer.parseInt(sentenceidTemp.substring(0,4));
+							int id = Integer.parseInt(sentenceidTemp.split(":")[1].replaceAll("\\s",""));
 							//map clustering id to database id
-							id = id + i;		
 							if(!temp3.get("clusterTopics").equals("[sentences_with_no_cluster_membership]"))								
-								writeStatement2.execute("UPDATE Normal SET topic = '"+ temp3.get("clusterTopics").toString().split(":")[0].replace("[", "").replace("]", "") +"' where id =" + id);													
+								writeStatement2.execute("UPDATE Normal SET topic = '"+ temp3.get("clusterTopics").toString().split(":")[0].replace("[", "").replace("]", "") +"' where id =" + id );													
 							else
 								writeStatement2.execute("UPDATE Normal SET topic = 'No Topic found' where id =" + id);													
 
 						}
 					}
+
 					conn.close();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

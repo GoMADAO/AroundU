@@ -165,6 +165,12 @@ public class read extends HttpServlet {
 		  OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());		  
 		  writer.write(sendingText.toString());		  
 		  writer.flush();
+		  try {
+			conn.close();
+		} catch (SQLException e) {
+		
+			e.printStackTrace();
+		}
 		
 	}
 

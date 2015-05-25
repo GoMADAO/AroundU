@@ -29,7 +29,7 @@ public class MyDeamon extends Thread{
 	
 	
 	private static AmazonSQS sqs;
-	private static Connection conn = null;
+	public static Connection conn = null;
 	
 	
 	
@@ -155,6 +155,7 @@ public class MyDeamon extends Thread{
 			
 			
 		}
+		//conn.close();
 	}
 
 	
