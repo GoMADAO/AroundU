@@ -40,7 +40,7 @@ public class MyDeamon extends Thread{
 			int Interval = 3600000*24;
 			try{	
 				while(true){
-					finalproj.Scavenger.go();
+					//finalproj.Scavenger.go();
 					Thread.sleep(Interval);
 				}
 													
